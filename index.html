@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Infinite Scroll Pagination</title>
+</head>
+<body>
+  <div id="chapters"></div>
+  <script>
+    let pageNo = 1;
+    const userId = '6426d445d7c58f0011abab79';
+    const otherId = '643cfde1811ac2001bfbf9dc'; 
+    const chapterContainer = document.getElementById('chapters');
+
+    const fetchChapters = async (page) => {
+      const response = await fetch(`http://localhost:3000/chapter/getMyChapter_v1/${userId}/${otherId}?pageNo=${page}`);
+      const data = await response.json();
+      return data;
+    };
+
+    const loadChapters = async () => {
+      const chapters = await fetchChapters(pageNo);
+      chapters.forEach(chapter => {
+        const chapterDiv = document.createElement('div');
+        chapterDiv.innerHTML = `
+          <h2>${chapter.title}</h2>
+          <p>${chapter.description}</p>
+        `;
+        chapterContainer.appendChild(chapterDiv);
+      });
+    };
+
+    const handleScroll = () => {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+        pageNo++;
+        loadChapters();
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    // Initial load
+    loadChapters();
+  </script>
+</body>
+</html>
